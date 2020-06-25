@@ -6,7 +6,11 @@ import com.mindorks.bootcamp.instagram.data.repository.UserRepository
 import com.mindorks.bootcamp.instagram.utils.common.Event
 import com.mindorks.bootcamp.instagram.utils.common.Resource
 import com.mindorks.bootcamp.instagram.utils.network.NetworkHelper
+import com.mindorks.bootcamp.instagram.utils.rx.TestSchedulerProvider
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.TestScheduler
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -36,4 +40,29 @@ class LoginViewModelTest {
     private lateinit var testScheduler : TestScheduler
 
     private lateinit var loginViewModel : LoginViewModel
+
+    @Before
+    fun setUp()
+    {
+        val compositeDisposable : CompositeDisposable = CompositeDisposable()
+        testScheduler = TestScheduler()
+        val testSchedulerProvider = TestSchedulerProvider(testScheduler)
+        loginViewModel = LoginViewModel(
+            testSchedulerProvider,
+            compositeDisposable,
+            networkHelper,
+            userRepository
+        )
+        loginViewModel.loggingIn.observeForever(loggingInObserver)
+        loginViewModel.launchDummy.observeForever(launchDummyObserver)
+        loginViewModel.messageStringId.observeForever(messageStringIdObserver)
+
+    }
+
+    @After
+    fun clear(){
+        loginViewModel.loggingIn.removeObserver(loggingInObserver)
+        loginViewModel.messageStringId.removeObserver(messageStringIdObserver)
+        loginViewModel.launchDummy.removeObserver(launchDummyObserver)
+    }
 }
