@@ -17,7 +17,7 @@ class LoginViewModel(
     private val userRepository: UserRepository
 ) : BaseViewModel(schedulerProvider, compositeDisposable, networkHelper) {
 
-    val launchDummy: MutableLiveData<Event<Map<String, String>>> = MutableLiveData()
+    val launchMain: MutableLiveData<Event<Map<String, String>>> = MutableLiveData()
 
     private val validationsList: MutableLiveData<List<Validation>> = MutableLiveData()
 
@@ -60,7 +60,7 @@ class LoginViewModel(
                             {
                                 userRepository.saveCurrentUser(it)
                                 loggingIn.postValue(false)
-                                launchDummy.postValue(Event(emptyMap()))
+                                launchMain.postValue(Event(emptyMap()))
                             },
                             {
                                 handleNetworkError(it)

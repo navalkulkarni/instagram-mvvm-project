@@ -10,6 +10,7 @@ import com.mindorks.bootcamp.instagram.R
 import com.mindorks.bootcamp.instagram.di.component.ActivityComponent
 import com.mindorks.bootcamp.instagram.ui.base.BaseActivity
 import com.mindorks.bootcamp.instagram.ui.dummy.DummyActivity
+import com.mindorks.bootcamp.instagram.ui.main.MainActivity
 import com.mindorks.bootcamp.instagram.utils.common.Event
 import com.mindorks.bootcamp.instagram.utils.common.Status
 import kotlinx.android.synthetic.main.activity_login.*
@@ -50,9 +51,9 @@ class LoginActivity : BaseActivity<LoginViewModel>() {
         super.setupObservers()
         // Event is used by the view model to tell the activity to launch another activity
         // view model also provided the Bundle in the event that is needed for the Activity
-        viewModel.launchDummy.observe(this, Observer<Event<Map<String, String>>> {
+        viewModel.launchMain.observe(this, Observer<Event<Map<String, String>>> {
             it.getIfNotHandled()?.run {
-                startActivity(Intent(applicationContext, DummyActivity::class.java))
+                startActivity(Intent(applicationContext, MainActivity::class.java))
                 finish()
             }
         })
