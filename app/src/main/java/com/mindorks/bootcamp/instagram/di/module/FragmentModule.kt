@@ -15,6 +15,7 @@ import com.mindorks.bootcamp.instagram.ui.profile.ProfileViewModel
 import com.mindorks.bootcamp.instagram.utils.ViewModelProviderFactory
 import com.mindorks.bootcamp.instagram.utils.network.NetworkHelper
 import com.mindorks.bootcamp.instagram.utils.rx.SchedulerProvider
+import com.mindorks.paracamera.Camera
 import dagger.Module
 import dagger.Provides
 import io.reactivex.disposables.CompositeDisposable
@@ -79,4 +80,15 @@ class FragmentModule(private val fragment: BaseFragment<*>) {
         fragment, ViewModelProviderFactory(PhotoViewModel::class) {
             PhotoViewModel(schedulerProvider, networkHelper, compositeDisposable)
         }).get(PhotoViewModel::class.java)
+
+    @Provides
+    fun provideCamera() = Camera.Builder()
+        .resetToCorrectOrientation(true)// it will rotate the camera bitmap to the correct orientation from meta data
+        .setTakePhotoRequestCode(1)
+        .setDirectory("temp")
+        .setName("camera_temp_img")
+        .setImageFormat(Camera.IMAGE_JPEG)
+        .setCompression(75)
+        .setImageHeight(500)// it will try to achieve this height as close as possible maintaining the aspect ratio;
+        .build(fragment)
 }

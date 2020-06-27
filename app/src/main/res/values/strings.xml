@@ -27,4 +27,9 @@
 
     <!--posts-->
     <string name="post_like_label">%1d Likes</string>
+
+    <!--photo-->
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="try_again">Please try again</string>
 </resources>
