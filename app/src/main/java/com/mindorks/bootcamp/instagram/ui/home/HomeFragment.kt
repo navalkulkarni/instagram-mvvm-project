@@ -9,6 +9,7 @@ import com.mindorks.bootcamp.instagram.R
 import com.mindorks.bootcamp.instagram.di.component.FragmentComponent
 import com.mindorks.bootcamp.instagram.ui.base.BaseFragment
 import com.mindorks.bootcamp.instagram.ui.home.posts.PostsAdapter
+import com.mindorks.bootcamp.instagram.ui.main.MainSharedViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 import javax.inject.Inject
 
@@ -25,11 +26,8 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         }
     }
 
-    override fun provideLayoutId(): Int  = R.layout.fragment_home
-
-     override fun injectDependencies(fragmentComponent: FragmentComponent) {
-        fragmentComponent.inject(this)
-    }
+    @Inject
+    lateinit var mainSharedViewModel: MainSharedViewModel
 
     @Inject
     lateinit var linearLayoutManager: LinearLayoutManager
@@ -37,11 +35,34 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     @Inject
     lateinit var postsAdapter: PostsAdapter
 
+    override fun provideLayoutId(): Int  = R.layout.fragment_home
+
+     override fun injectDependencies(fragmentComponent: FragmentComponent) {
+        fragmentComponent.inject(this)
+    }
+
+
     override fun setupObservers() {
         super.setupObservers()
 
+
+        viewModel.loading.observe(this, Observer {
+            progressBar.visibility = if (it) View.VISIBLE else View.GONE
+        })
+
         viewModel.posts.observe(this, Observer {
             it.data?.run { postsAdapter.appendData(this) }
+        })
+
+        mainSharedViewModel.newPost.observe(this, Observer {
+            it.getIfNotHandled()?.run { viewModel.onNewPost(this) }
+        })
+
+        viewModel.refreshPosts.observe(this, Observer {
+            it.data?.run {
+                postsAdapter.updateList(this)
+                rvPosts.scrollToPosition(0)
+            }
         })
     }
 

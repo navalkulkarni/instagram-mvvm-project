@@ -88,6 +88,23 @@ class PhotoViewModel(
 
     private fun uploadPhotoAndCreatePost(imageFile: File, imageSize: Pair<Int, Int>) {
         Logger.d("DEBUG", imageFile.path)
+        compositeDisposable.add(
+            photoRepository.uploadPhoto(imageFile, user)
+                .flatMap {
+                    postRepository.createPost(it, imageSize.first, imageSize.second, user)
+                }
+                .subscribeOn(schedulerProvider.io())
+                .subscribe(
+                    {
+                        loading.postValue(false)
+                        post.postValue(Event(it))
+                    },
+                    {
+                        handleNetworkError(it)
+                        loading.postValue(false)
+                    }
+                )
 
+        )
     }
 }

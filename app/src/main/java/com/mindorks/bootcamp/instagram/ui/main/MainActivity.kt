@@ -11,11 +11,15 @@ import com.mindorks.bootcamp.instagram.ui.home.HomeFragment
 import com.mindorks.bootcamp.instagram.ui.photo.PhotoFragment
 import com.mindorks.bootcamp.instagram.ui.profile.ProfileFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : BaseActivity<MainViewModel>() {
     companion object {
         const val TAG = "MainActivity"
     }
+
+    @Inject
+    lateinit var mainSharedViewModel: MainSharedViewModel
 
     private var activeFragment: Fragment? = null
 
@@ -61,6 +65,10 @@ class MainActivity : BaseActivity<MainViewModel>() {
 
         viewModel.photoNavigation.observe(this, Observer {
             it.getIfNotHandled()?.run { showAddPhoto() }
+        })
+
+        mainSharedViewModel.homeRedirection.observe(this, Observer {
+            it.getIfNotHandled()?.run { bottomNavigation.selectedItemId = R.id.itemHome }
         })
 
     }

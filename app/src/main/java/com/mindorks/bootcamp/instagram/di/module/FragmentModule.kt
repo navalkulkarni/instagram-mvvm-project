@@ -3,13 +3,16 @@ package com.mindorks.bootcamp.instagram.di.module
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mindorks.bootcamp.instagram.data.repository.DummyRepository
+import com.mindorks.bootcamp.instagram.data.repository.PhotoRepository
 import com.mindorks.bootcamp.instagram.data.repository.PostRepository
 import com.mindorks.bootcamp.instagram.data.repository.UserRepository
+import com.mindorks.bootcamp.instagram.di.TempDirectory
 import com.mindorks.bootcamp.instagram.ui.base.BaseFragment
 import com.mindorks.bootcamp.instagram.ui.dummies.DummiesAdapter
 import com.mindorks.bootcamp.instagram.ui.dummies.DummiesViewModel
 import com.mindorks.bootcamp.instagram.ui.home.HomeViewModel
 import com.mindorks.bootcamp.instagram.ui.home.posts.PostsAdapter
+import com.mindorks.bootcamp.instagram.ui.main.MainSharedViewModel
 import com.mindorks.bootcamp.instagram.ui.photo.PhotoViewModel
 import com.mindorks.bootcamp.instagram.ui.profile.ProfileViewModel
 import com.mindorks.bootcamp.instagram.utils.ViewModelProviderFactory
@@ -20,6 +23,7 @@ import dagger.Module
 import dagger.Provides
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.processors.PublishProcessor
+import java.io.File
 
 @Module
 class FragmentModule(private val fragment: BaseFragment<*>) {
@@ -71,15 +75,6 @@ class FragmentModule(private val fragment: BaseFragment<*>) {
             ProfileViewModel(schedulerProvider,  networkHelper,compositeDisposable)
         }).get(ProfileViewModel::class.java)
 
-    @Provides
-    fun providePhotoViewModel(
-        schedulerProvider: SchedulerProvider,
-        compositeDisposable: CompositeDisposable,
-        networkHelper: NetworkHelper
-    ): PhotoViewModel = ViewModelProviders.of(
-        fragment, ViewModelProviderFactory(PhotoViewModel::class) {
-            PhotoViewModel(schedulerProvider, networkHelper, compositeDisposable)
-        }).get(PhotoViewModel::class.java)
 
     @Provides
     fun provideCamera() = Camera.Builder()
@@ -91,4 +86,31 @@ class FragmentModule(private val fragment: BaseFragment<*>) {
         .setCompression(75)
         .setImageHeight(500)// it will try to achieve this height as close as possible maintaining the aspect ratio;
         .build(fragment)
+
+    @Provides
+    fun providePhotoViewModel(
+        schedulerProvider: SchedulerProvider,
+        compositeDisposable: CompositeDisposable,
+        userRepository: UserRepository,
+        photoRepository: PhotoRepository,
+        postRepository: PostRepository,
+        networkHelper: NetworkHelper,
+        @TempDirectory directory: File
+    ): PhotoViewModel = ViewModelProviders.of(
+        fragment, ViewModelProviderFactory(PhotoViewModel::class) {
+            PhotoViewModel(
+                schedulerProvider, compositeDisposable, userRepository,
+                photoRepository, postRepository, networkHelper, directory
+            )
+        }).get(PhotoViewModel::class.java)
+
+    @Provides
+    fun provideMainSharedViewModel(
+        schedulerProvider: SchedulerProvider,
+        compositeDisposable: CompositeDisposable,
+        networkHelper: NetworkHelper
+    ): MainSharedViewModel = ViewModelProviders.of(
+        fragment.activity!!, ViewModelProviderFactory(MainSharedViewModel::class) {
+            MainSharedViewModel(schedulerProvider, compositeDisposable, networkHelper)
+        }).get(MainSharedViewModel::class.java)
 }

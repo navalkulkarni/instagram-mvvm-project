@@ -7,11 +7,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import com.mindorks.bootcamp.instagram.R
 import com.mindorks.bootcamp.instagram.di.component.FragmentComponent
 import com.mindorks.bootcamp.instagram.ui.base.BaseFragment
 import com.mindorks.bootcamp.instagram.ui.home.HomeFragment
 import com.mindorks.bootcamp.instagram.ui.home.HomeViewModel
+import com.mindorks.bootcamp.instagram.ui.main.MainSharedViewModel
+import com.mindorks.bootcamp.instagram.utils.common.Event
 import com.mindorks.paracamera.Camera
 import kotlinx.android.synthetic.main.fragment_photo.*
 import java.io.FileNotFoundException
@@ -32,6 +35,8 @@ class PhotoFragment : BaseFragment<PhotoViewModel>() {
         }
     }
 
+    @Inject
+    lateinit var mainSharedViewModel: MainSharedViewModel
 
     @Inject
     lateinit var camera: Camera
@@ -44,6 +49,17 @@ class PhotoFragment : BaseFragment<PhotoViewModel>() {
 
     override fun setupObservers() {
         super.setupObservers()
+
+        viewModel.loading.observe(this, Observer {
+            pb_loading.visibility = if (it) View.VISIBLE else View.GONE
+        })
+
+        viewModel.post.observe(this, Observer {
+            it.getIfNotHandled()?.run {
+                mainSharedViewModel.newPost.postValue(Event(this))
+                mainSharedViewModel.onHomeRedirect()
+            }
+        })
     }
 
     override fun setupView(view: View) {
