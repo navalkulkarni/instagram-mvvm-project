@@ -74,7 +74,7 @@ class PhotoFragment : BaseFragment<PhotoViewModel>() {
                     try {
                         intent?.data?.let {
                             activity?.contentResolver?.openInputStream(it)?.run {
-  //                              viewModel.onGalleryImageSelected(this)
+                              viewModel.onGalleryImageSelected(this)
                             }
                         } ?: showMessage(R.string.try_again)
                     } catch (e: FileNotFoundException) {
@@ -83,7 +83,7 @@ class PhotoFragment : BaseFragment<PhotoViewModel>() {
                     }
                 }
                 Camera.REQUEST_TAKE_PHOTO -> {
-   //                 viewModel.onCameraImageTaken { camera.cameraBitmapPath }
+                    viewModel.onCameraImageTaken { camera.cameraBitmapPath }
                 }
             }
         }
